@@ -181,7 +181,12 @@ func Parse(r io.Reader, pkgName string) (*Report, error) {
 			seenSummary = true
 		} else if !seenSummary {
 			// buffer anything else that we didn't recognize
-			buffer = append(buffer, line)
+			test := findTest(tests, cur)
+			if test != nil && test.Result == FAIL {
+				test.Output = append(test.Output, line)
+			} else {
+				buffer = append(buffer, line)
+			}
 		}
 	}
 
