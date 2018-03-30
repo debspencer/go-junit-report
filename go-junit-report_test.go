@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/jstemmer/go-junit-report/formatter"
 	"github.com/jstemmer/go-junit-report/parser"
 )
 
@@ -764,6 +765,48 @@ var testCases = []TestCase{
 			},
 		},
 	},
+	{
+		name:       "20-parallel.txt",
+		reportName: "20-report.xml",
+		report: &parser.Report{
+			Packages: []parser.Package{
+				{
+					Name: "pkg/parallel",
+					Time: 3010,
+					Tests: []*parser.Test{
+						{
+							Name:   "FirstTest",
+							Time:   2000,
+							Result: parser.FAIL,
+							Output: []string{
+								"Message from first",
+								"Supplemental from first",
+								"parallel_test.go:14: FirstTest error",
+							},
+						},
+						{
+							Name:   "SecondTest",
+							Time:   1000,
+							Result: parser.FAIL,
+							Output: []string{
+								"Message from second",
+								"parallel_test.go:23: SecondTest error",
+							},
+						},
+						{
+							Name:   "ThirdTest",
+							Time:   10,
+							Result: parser.FAIL,
+							Output: []string{
+								"Message from third",
+								"parallel_test.go:32: ThirdTest error",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
 }
 
 func TestParser(t *testing.T) {
@@ -849,7 +892,7 @@ func testJUnitFormatter(t *testing.T, goVersion string) {
 
 		var junitReport bytes.Buffer
 
-		if err = JUnitReportXML(testCase.report, testCase.noXMLHeader, goVersion, &junitReport); err != nil {
+		if err = formatter.JUnitReportXML(testCase.report, testCase.noXMLHeader, goVersion, &junitReport); err != nil {
 			t.Fatal(err)
 		}
 
